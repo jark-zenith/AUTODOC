@@ -1,0 +1,9 @@
+import { NextResponse } from "next/server";
+import { adminService } from "@/lib/admin";
+import { identityService } from "@/lib/identity";
+import { permissionService } from "@/lib/security/permissions";
+import { familyId, members } from "@/lib/family";
+import { auditService } from "@/lib/security";
+const session = identityService.developmentSession(familyId, members[0].id, "OWNER");
+export function GET() { const access = permissionService.check(session, { actorId: members[0].id, actorType: "OWNER", familyId, permission: "SYSTEM_SETTINGS_VIEW", purpose: "ADMINISTRATION", timestamp: new Date().toISOString() }, "SYSTEM_SETTINGS_VIEW"); auditService.record({ actorId: members[0].id, familyId, action: "ADMIN_DASHBOARD_VIEW", resource: "SYSTEM", allowed: access.allowed, reason: access.reason, timestamp: new Date().toISOString() }); if (!access.allowed) return NextResponse.json({ error: access.reason }, { status: 403 }); return NextResponse.json(adminService.getSnapshot(session)); }
+export async function POST(request: Request) { const body = await request.json().catch(() => null) as { action?: unknown } | null; const action = body?.action; const access = permissionService.check(session, { actorId: members[0].id, actorType: "OWNER", familyId, permission: "SYSTEM_SETTINGS_EDIT", purpose: "ADMINISTRATION", timestamp: new Date().toISOString() }, "SYSTEM_SETTINGS_EDIT"); if (!access.allowed) return NextResponse.json({ error: access.reason }, { status: 403 }); if (action === "health-check") return NextResponse.json({ result: adminService.runHealthCheck() }); if (action === "review-knowledge") return NextResponse.json({ result: adminService.reviewPendingKnowledgeUpdates() }); if (action === "audit") return NextResponse.json({ result: adminService.inspectAudit() }); if (action === "failed-tasks") return NextResponse.json({ result: adminService.inspectFailedTasks() }); return NextResponse.json({ error: "Unsupported safe admin action" }, { status: 400 }); }

@@ -1,0 +1,7 @@
+import { NextResponse } from "next/server";
+import { demoFamilyService } from "@/lib/family";
+import type { HealthFollowUp } from "@/types/family";
+type Context = { params: Promise<{ memberId: string }> };
+const familyId = "FAMILY-DEMO-001";
+export async function GET(_request: Request, context: Context) { const { memberId } = await context.params; if (!demoFamilyService.getMember(familyId, memberId)) return NextResponse.json({ error: "Member not found" }, { status: 404 }); return NextResponse.json({ followUps: demoFamilyService.listFollowUps(memberId), simulated: true }); }
+export async function POST(request: Request, context: Context) { const { memberId } = await context.params; if (!demoFamilyService.getMember(familyId, memberId)) return NextResponse.json({ error: "Member not found" }, { status: 404 }); const body = await request.json().catch(() => null) as { title?: unknown; description?: unknown } | null; if (!body || typeof body.title !== "string" || typeof body.description !== "string") return NextResponse.json({ error: "title and description are required" }, { status: 400 }); const now = new Date().toISOString(); const followUp: HealthFollowUp = { id: `FOLLOWUP-${Date.now()}`, memberId, title: body.title, description: body.description, status: "PENDING", createdAt: now, updatedAt: now }; return NextResponse.json({ followUp: demoFamilyService.saveFollowUp(followUp) }, { status: 201 }); }

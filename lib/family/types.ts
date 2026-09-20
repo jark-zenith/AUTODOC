@@ -1,0 +1,1 @@
+export type FamilyRecord = { family: import("@/types/family").Family; members: import("@/types/family").FamilyMember[]; healthProfiles: import("@/types/family").FamilyHealthProfile[]; preferences: import("@/types/family").FamilyMemberPreferences[]; history: import("@/types/family").HealthHistoryEvent[]; followUps: import("@/types/family").HealthFollowUp[] };

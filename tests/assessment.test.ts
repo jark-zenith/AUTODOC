@@ -1,0 +1,17 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { responseService } from "../lib/medical/response";
+import { symptomUnderstandingEngine } from "../lib/medical/symptoms";
+
+function assess(text: string, source: "USER_TEXT" | "SIMULATION" = "USER_TEXT") { return responseService.assess({ originalInput: text, source, createdAt: "2026-09-20T00:00:00.000Z" }); }
+
+test("creates an informational assessment with structured symptoms", () => { const result = assess("I have a cough and fatigue."); assert.equal(result.overallStatus, "INFORMATIONAL"); assert.deepEqual(result.symptoms.map((symptom) => symptom.normalizedName), ["cough", "fatigue"]); });
+test("preserves possible explanations from Reasoning", () => { const result = assess("I have a cough, fever and fatigue."); assert.ok(result.possibleExplanations.length > 0); assert.equal(result.reasoningResult.method, "deterministic-knowledge-matching"); });
+test("returns insufficient information without inventing symptoms", () => { const result = assess("I do not feel well."); assert.equal(result.overallStatus, "INSUFFICIENT_INFORMATION"); assert.equal(result.symptoms.length, 0); assert.equal(result.nextStep.category, "NEED_MORE_INFORMATION"); });
+test("gives Safety priority over ordinary reasoning", () => { const result = assess("I have severe difficulty breathing."); assert.equal(result.overallStatus, "URGENT_REVIEW"); assert.equal(result.detectedSafetySignals[0]?.id, "RF-BREATHING"); assert.ok(result.summary.startsWith("A potential warning signal")); assert.equal(result.nextStep.category, "SEEK_URGENT_PROFESSIONAL_HELP"); });
+test("supports multiple reasoning candidates", () => { const result = assess("I have a cough, fever and fatigue."); assert.ok(result.possibleExplanations.length >= 2); });
+test("keeps missing symptoms unknown", () => { const result = assess("I have a cough."); assert.ok(result.limitations.some((limitation) => limitation.includes("not assumed to be absent"))); });
+test("marks simulation assessments clearly", () => { const result = assess("The fictional patient has a cough.", "SIMULATION"); assert.equal(result.nextStep.category, "SIMULATION_ONLY"); assert.ok(result.nextStep.message.includes("fictional simulation")); });
+test("repeated inputs preserve deterministic content", () => { const first = assess("I have a cough and fever."); const second = assess("I have a cough and fever."); assert.deepEqual({ status: first.overallStatus, summary: first.summary, explanations: first.possibleExplanations }, { status: second.overallStatus, summary: second.summary, explanations: second.possibleExplanations }); });
+test("does not generate diagnosis or treatment language", () => { const result = assess("I have a cough and fever."); const output = JSON.stringify(result).toLowerCase(); assert.equal(output.includes("confirmed"), false); assert.equal(output.includes("prescription"), false); assert.equal(output.includes("dosage"), false); assert.equal(output.includes("take this medicine"), false); });
+test("structured symptoms bypass extraction", () => { const symptoms = symptomUnderstandingEngine.analyze({ freeText: "I have a cough.", source: "USER_TEXT" }).extractedSymptoms; const result = responseService.assess({ originalInput: "structured simulation input", symptoms, source: "SIMULATION" }); assert.equal(result.symptoms[0]?.normalizedName, "cough"); assert.equal(result.nextStep.category, "SIMULATION_ONLY"); });

@@ -1,0 +1,3 @@
+import { notificationManager, type CreateNotificationInput } from "./notification-manager";
+export class NotificationService { create(input: CreateNotificationInput) { return notificationManager.create(input); } list(familyId: string, memberId?: string) { return notificationManager.list(familyId, memberId); } get(id: string, familyId: string, memberId?: string) { return notificationManager.get(id, familyId, memberId); } read(id: string, familyId: string, memberId?: string) { return notificationManager.read(id, familyId, memberId); } dismiss(id: string, familyId: string, memberId?: string) { return notificationManager.dismiss(id, familyId, memberId); } }
+export const notificationService = new NotificationService();

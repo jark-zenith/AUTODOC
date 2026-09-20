@@ -1,0 +1,14 @@
+export type FamilyStatus = "ACTIVE" | "INACTIVE" | "ARCHIVED";
+export type FamilyRelationship = "OWNER" | "PARENT" | "SPOUSE" | "CHILD" | "SIBLING" | "GRANDPARENT" | "RELATIVE" | "OTHER";
+export type FamilyProfileStatus = "ACTIVE" | "INACTIVE" | "ARCHIVED";
+export type NotificationChannel = "IN_APP" | "BROWSER" | "PUSH" | "EMAIL" | "SMS" | "VOICE";
+export type FamilySettings = { memoryEnabled: boolean; healthFollowupsEnabled: boolean; notificationsEnabled: boolean; safetyNotificationsEnabled: boolean; followUpNotificationsEnabled: boolean; taskNotificationsEnabled: boolean; identityVerificationEnabled: boolean; defaultLanguage: string; timezone: string };
+export type Family = { id: string; name: string; createdAt: string; updatedAt: string; ownerMemberId: string; settings: FamilySettings; status: FamilyStatus; memberIds: string[] };
+export type FamilyMember = { id: string; familyId: string; name: string; preferredName?: string; age: number; dateOfBirth: string; sex: "Female" | "Male" | "Intersex" | "Unspecified"; relationship: FamilyRelationship; profileStatus: FamilyProfileStatus; createdAt: string; updatedAt: string };
+export type FamilyHealthProfile = { memberId: string; bloodType?: string; allergies: string[]; medicalHistory: string[]; currentConditions: string[]; previousProcedures: string[]; familyHistory: string[]; importantNotes: string[]; createdAt: string; updatedAt: string };
+export type FamilyMemberPreferences = { memberId: string; preferredName?: string; preferredLanguage: string; communicationStyle: "CONCISE" | "STANDARD" | "DETAILED"; reminderPreferences: string[]; explanationPreferences: string[]; accessibilityPreferences: string[]; notificationsEnabled: boolean; followUpNotifications: boolean; taskNotifications: boolean; safetyNotifications: boolean; systemNotifications: boolean; preferredNotificationChannel: NotificationChannel };
+export type HealthHistoryEventType = "SYMPTOM_REPORT" | "ASSESSMENT" | "PROCEDURE" | "KNOWN_CONDITION" | "ALLERGY" | "FOLLOW_UP" | "OTHER";
+export type HealthHistorySource = "USER_PROVIDED" | "SYSTEM_GENERATED" | "SIMULATION" | "IMPORT";
+export type HealthHistoryEvent = { id: string; memberId: string; type: HealthHistoryEventType; title: string; description: string; date: string; source: HealthHistorySource; createdAt: string };
+export type HealthFollowUpStatus = "PENDING" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "OVERDUE";
+export type HealthFollowUp = { id: string; memberId: string; title: string; description: string; relatedAssessmentId?: string; status: HealthFollowUpStatus; scheduledFor?: string; completedAt?: string; createdAt: string; updatedAt: string; taskId?: string };

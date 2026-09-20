@@ -1,0 +1,3 @@
+import type { HealthFollowUp } from "@/types/family";
+import type { Notification } from "@/types/notification";
+export function followUpNotification(familyId: string, followUp: HealthFollowUp, overdue = false): Omit<Notification, "id" | "status" | "createdAt"> { return { familyId, memberId: followUp.memberId, type: "FOLLOW_UP", title: overdue ? "AUTODOC follow-up is overdue" : "Follow-up reminder for family member", message: overdue ? "An AUTODOC follow-up is overdue." : "A configured AUTODOC follow-up is due for review.", priority: overdue ? "HIGH" : "NORMAL", source: "FOLLOW_UP", relatedFollowUpId: followUp.id, relatedTaskId: followUp.taskId, idempotencyKey: `FOLLOWUP_${overdue ? "OVERDUE" : "DUE"}:${followUp.id}` }; }

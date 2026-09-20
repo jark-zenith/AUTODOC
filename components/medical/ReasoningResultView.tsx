@@ -1,0 +1,8 @@
+import type { ReasoningResult } from "@/lib/medical/reasoning";
+import { ReasoningCard } from "./ReasoningCard";
+
+type ReasoningResultViewProps = { result: ReasoningResult };
+
+export function ReasoningResultView({ result }: ReasoningResultViewProps) {
+  return <div className="reasoning-result-layout"><section className="reasoning-results panel"><div className="panel-heading"><div><p className="panel-eyebrow">Knowledge matching output</p><h2>Possible explanations</h2></div><span className="timeline-status">{result.method}</span></div><div className="reasoning-results-body">{result.possibleExplanations.length ? result.possibleExplanations.map((explanation) => <ReasoningCard key={explanation.knowledgeId} explanation={explanation} />) : <p className="task-empty">No meaningful relationship found in the current educational knowledge entries.</p>}</div></section><section className="reasoning-meta panel"><div className="panel-heading"><div><p className="panel-eyebrow">Interpretation boundary</p><h2>Limitations</h2></div><span className="timeline-status">EDUCATIONAL</span></div><div className="reasoning-meta-body"><p>{result.reasoningSummary}</p><h3>Limitations</h3><ul>{result.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>{result.unmatchedSymptoms.length ? <div className="reasoning-unmatched"><strong>Information not represented</strong><p>{result.unmatchedSymptoms.join(" · ")}</p></div> : null}{result.warnings.length ? <div className="reasoning-warning"><strong>SAFETY ENGINE HANDOFF</strong><p>{result.warnings.join(" ")}</p></div> : null}</div></section></div>;
+}

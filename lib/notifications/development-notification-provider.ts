@@ -1,0 +1,3 @@
+import type { NotificationProvider, NotificationDeliveryResult } from "./types";
+import type { Notification } from "@/types/notification";
+export class DevelopmentNotificationProvider implements NotificationProvider { send(notification: Notification): NotificationDeliveryResult { return { status: "DELIVERED", notificationId: notification.id, reason: "Delivered inside the AUTODOC development interface only." }; } cancel(notificationId: string) { return { status: "DELIVERED" as const, notificationId, reason: "Cancelled in the development interface only." }; } getStatus() { return "READY" as const; } }

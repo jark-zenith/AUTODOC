@@ -1,0 +1,5 @@
+import { NextResponse } from "next/server";
+import { demoFamilyService } from "@/lib/family";
+
+export function GET() { return NextResponse.json({ families: demoFamilyService.listFamilies(), simulated: true }); }
+export async function POST(request: Request) { const body = await request.json().catch(() => null) as { name?: unknown; owner?: Record<string, unknown> } | null; if (!body || typeof body.name !== "string" || !body.owner) return NextResponse.json({ error: "name and owner are required" }, { status: 400 }); const family = demoFamilyService.createFamily(body.name, { name: typeof body.owner.name === "string" ? body.owner.name : "Demo Owner", preferredName: typeof body.owner.preferredName === "string" ? body.owner.preferredName : undefined, age: typeof body.owner.age === "number" ? body.owner.age : 0, dateOfBirth: typeof body.owner.dateOfBirth === "string" ? body.owner.dateOfBirth : "UNKNOWN", sex: "Unspecified", relationship: "OWNER", profileStatus: "ACTIVE" }); return NextResponse.json({ family }, { status: 201 }); }

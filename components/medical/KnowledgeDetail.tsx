@@ -1,0 +1,10 @@
+import type { KnowledgeEntry } from "@/types/medical";
+
+type KnowledgeDetailProps = { entry?: KnowledgeEntry };
+
+function DetailList({ title, items, warning = false }: { title: string; items: string[]; warning?: boolean }) { return <section className={`knowledge-detail-section ${warning ? "is-warning" : ""}`}><h3>{title}</h3>{items.length ? <ul>{items.map((item) => <li key={item}>{item}</li>)}</ul> : <p className="knowledge-empty">No entry recorded.</p>}</section>; }
+
+export function KnowledgeDetail({ entry }: KnowledgeDetailProps) {
+  if (!entry) return <section className="knowledge-detail panel"><p className="task-empty">Select a knowledge entry to inspect it.</p></section>;
+  return <section className="knowledge-detail panel" aria-labelledby="knowledge-detail-title"><div className="profile-header"><div><p className="panel-eyebrow">Knowledge record / {entry.id}</p><h2 id="knowledge-detail-title">{entry.title}</h2><p className="profile-subtitle">{entry.category} · Educational reference</p></div><span className={`knowledge-card-status ${entry.status.toLowerCase()}`}>{entry.status.replace("_", " ")}</span></div><div className="knowledge-detail-body"><p className="knowledge-description">{entry.description}</p><div className="knowledge-detail-grid"><DetailList title="Symptoms" items={entry.symptoms} /><DetailList title="Causes" items={entry.causes} /><DetailList title="Risk factors" items={entry.riskFactors} /><DetailList title="Common triggers" items={entry.commonTriggers} /><DetailList title="Prevention" items={entry.prevention} /><DetailList title="Warning signs" items={entry.warningSigns} warning /></div><div className="knowledge-version"><span>Version {entry.version.version}</span><span>Workflow status: {entry.version.status}</span><span>Source: {entry.version.source}</span></div><p className="knowledge-disclaimer"><span>i</span> Educational information only. This entry does not diagnose, prescribe, or replace professional healthcare guidance.</p></div></section>;
+}

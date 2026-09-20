@@ -1,0 +1,21 @@
+import type { Family, FamilyHealthProfile, FamilyMember, FamilyMemberPreferences, HealthFollowUp, HealthHistoryEvent } from "@/types/family";
+
+export interface FamilyStore { listFamilies(): Family[]; getFamily(id: string): Family | undefined; saveFamily(family: Family): Family; listMembers(familyId: string): FamilyMember[]; getMember(familyId: string, memberId: string): FamilyMember | undefined; saveMember(member: FamilyMember): FamilyMember; getHealthProfile(memberId: string): FamilyHealthProfile | undefined; saveHealthProfile(profile: FamilyHealthProfile): FamilyHealthProfile; getPreferences(memberId: string): FamilyMemberPreferences | undefined; savePreferences(preferences: FamilyMemberPreferences): FamilyMemberPreferences; listHistory(memberId: string): HealthHistoryEvent[]; saveHistory(event: HealthHistoryEvent): HealthHistoryEvent; listFollowUps(memberId: string): HealthFollowUp[]; saveFollowUp(followUp: HealthFollowUp): HealthFollowUp; }
+
+export class InMemoryFamilyStore implements FamilyStore {
+  private families = new Map<string, Family>(); private members = new Map<string, FamilyMember>(); private health = new Map<string, FamilyHealthProfile>(); private preferences = new Map<string, FamilyMemberPreferences>(); private history = new Map<string, HealthHistoryEvent>(); private followUps = new Map<string, HealthFollowUp>();
+  listFamilies() { return Array.from(this.families.values()).map((item) => ({ ...item, settings: { ...item.settings }, memberIds: [...item.memberIds] })); }
+  getFamily(id: string) { const item = this.families.get(id); return item ? { ...item, settings: { ...item.settings }, memberIds: [...item.memberIds] } : undefined; }
+  saveFamily(family: Family) { this.families.set(family.id, { ...family, settings: { ...family.settings }, memberIds: [...family.memberIds] }); return this.getFamily(family.id) as Family; }
+  listMembers(familyId: string) { return Array.from(this.members.values()).filter((item) => item.familyId === familyId).map((item) => ({ ...item })); }
+  getMember(familyId: string, memberId: string) { const item = this.members.get(memberId); return item && item.familyId === familyId ? { ...item } : undefined; }
+  saveMember(member: FamilyMember) { this.members.set(member.id, { ...member }); return { ...member }; }
+  getHealthProfile(memberId: string) { const item = this.health.get(memberId); return item ? { ...item, allergies: [...item.allergies], medicalHistory: [...item.medicalHistory], currentConditions: [...item.currentConditions], previousProcedures: [...item.previousProcedures], familyHistory: [...item.familyHistory], importantNotes: [...item.importantNotes] } : undefined; }
+  saveHealthProfile(profile: FamilyHealthProfile) { this.health.set(profile.memberId, { ...profile, allergies: [...profile.allergies], medicalHistory: [...profile.medicalHistory], currentConditions: [...profile.currentConditions], previousProcedures: [...profile.previousProcedures], familyHistory: [...profile.familyHistory], importantNotes: [...profile.importantNotes] }); return this.getHealthProfile(profile.memberId) as FamilyHealthProfile; }
+  getPreferences(memberId: string) { const item = this.preferences.get(memberId); return item ? { ...item, reminderPreferences: [...item.reminderPreferences], explanationPreferences: [...item.explanationPreferences], accessibilityPreferences: [...item.accessibilityPreferences] } : undefined; }
+  savePreferences(preferences: FamilyMemberPreferences) { this.preferences.set(preferences.memberId, { ...preferences, reminderPreferences: [...preferences.reminderPreferences], explanationPreferences: [...preferences.explanationPreferences], accessibilityPreferences: [...preferences.accessibilityPreferences] }); return this.getPreferences(preferences.memberId) as FamilyMemberPreferences; }
+  listHistory(memberId: string) { return Array.from(this.history.values()).filter((item) => item.memberId === memberId).map((item) => ({ ...item })); }
+  saveHistory(event: HealthHistoryEvent) { this.history.set(event.id, { ...event }); return { ...event }; }
+  listFollowUps(memberId: string) { return Array.from(this.followUps.values()).filter((item) => item.memberId === memberId).map((item) => ({ ...item })); }
+  saveFollowUp(followUp: HealthFollowUp) { this.followUps.set(followUp.id, { ...followUp }); return { ...followUp }; }
+}
