@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/*.test.ts",
+    "test": "tsx --test tests/*.test.ts",
     "preview": "opennextjs-cloudflare build && wrangler dev",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
@@ -30,6 +30,7 @@
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
     "wrangler": "latest",
-    "@next/eslint-plugin-next": "^15.5.7"
+    "@next/eslint-plugin-next": "^15.5.7",
+    "tsx": "latest"
   }
 }
