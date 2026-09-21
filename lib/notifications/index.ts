@@ -6,6 +6,3 @@ export { followUpNotification } from "./notification-rules";
 export { InMemoryNotificationStore } from "./notification-store";
 export type { CreateNotificationInput } from "./notification-manager";
 export type { NotificationDeliveryResult, NotificationProvider } from "./types";
-export interface NotificationService {
-  readonly name: "notifications";
-}
