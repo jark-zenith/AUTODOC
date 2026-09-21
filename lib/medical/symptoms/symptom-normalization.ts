@@ -7,6 +7,7 @@ const normalizationDictionary: Record<string, string> = {
   tired: "fatigue",
   fatigued: "fatigue",
   "feeling tired": "fatigue",
+  fatigue: "fatigue",
   weak: "weakness",
   weakness: "weakness",
   fever: "fever",
